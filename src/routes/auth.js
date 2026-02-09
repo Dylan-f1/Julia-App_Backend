@@ -20,7 +20,8 @@ router.post(
     body('firstName').trim().notEmpty(),
     body('lastName').trim().notEmpty(),
     body('profession').notEmpty(),
-    body('workLocation').notEmpty(),
+    body('workLocation').optional().trim(),
+    body('consultationType').optional().trim(),
     validate,
   ],
   registerProfessional

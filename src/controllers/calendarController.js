@@ -1,4 +1,3 @@
-// Ce fichier est un placeholder pour les intégrations calendrier
 // Les implémentations réelles dépendront des APIs Doctolib, Medoucine, etc.
 
 // @desc    Get calendar availability (placeholder)

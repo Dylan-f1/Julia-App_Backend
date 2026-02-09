@@ -3,11 +3,11 @@ const mailjet = require('../config/mailjet');
 exports.sendMagicLink = async (email, token, patientName) => {
   if (!mailjet) {
     console.log('⚠️ Mailjet non configuré - Email non envoyé');
-    console.log(`📧 Magic link pour ${email}: ${process.env.FRONTEND_URL}/auth/verify?token=${token}`);
+    console.log(`📧 Magic link pour ${email}: ${process.env.FRONTEND_URL}/auth/verify-magic-link?token=${token}`);
     return { success: true, message: 'Mailjet non configuré - lien affiché en console' };
   }
 
-  const magicLink = `${process.env.FRONTEND_URL}/auth/verify?token=${token}`;
+  const magicLink = `${process.env.FRONTEND_URL}/auth/verify-magic-link?token=${token}`;
 
   try {
     const result = await mailjet.post('send', { version: 'v3.1' }).request({
