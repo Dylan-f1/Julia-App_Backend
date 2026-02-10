@@ -212,7 +212,6 @@ exports.deletePatient = async (req, res) => {
   }
 };
 
-// @desc    Resend magic link
 // @route   POST /api/patients/:id/resend-magic-link
 exports.resendMagicLink = async (req, res) => {
   try {
@@ -222,7 +221,6 @@ exports.resendMagicLink = async (req, res) => {
       return res.status(404).json({ message: 'Patient non trouvé' });
     }
 
-    // Vérifier que le patient appartient au professionnel
     if (patient.professionalId.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'Non autorisé' });
     }
@@ -230,6 +228,10 @@ exports.resendMagicLink = async (req, res) => {
     // Générer nouveau magic link
     const token = patient.generateMagicLink();
     await patient.save();
+
+    // Générer QR code
+    const magicLink = `${process.env.FRONTEND_URL}/auth/verify?token=${token}`;
+    const qrCodeDataUrl = await QRCode.toDataURL(magicLink);
 
     // Envoyer l'email
     await emailService.sendMagicLink(
@@ -241,6 +243,8 @@ exports.resendMagicLink = async (req, res) => {
     res.json({
       success: true,
       message: 'Email de connexion renvoyé',
+      magicLink,
+      qrCode: qrCodeDataUrl,
     });
   } catch (error) {
     console.error(error);
@@ -248,7 +252,6 @@ exports.resendMagicLink = async (req, res) => {
   }
 };
 
-// @desc    Get patient profile (for patient)
 // @route   GET /api/patients/me
 exports.getMyProfile = async (req, res) => {
   try {
