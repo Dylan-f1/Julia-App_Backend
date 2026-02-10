@@ -12,7 +12,6 @@ const conversationSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    
     messages: [
       {
         sender: {
@@ -34,7 +33,6 @@ const conversationSchema = new mongoose.Schema(
         },
       },
     ],
-    
     // Auto-évaluation post-discussion
     evaluation: {
       gravityLevel: {
@@ -45,7 +43,6 @@ const conversationSchema = new mongoose.Schema(
       timestamp: Date,
       rationality: Boolean,
     },
-    
     // Synthèse générée par l'IA
     summary: {
       keywords: [String],
@@ -56,13 +53,11 @@ const conversationSchema = new mongoose.Schema(
       },
       generatedAt: Date,
     },
-    
     status: {
       type: String,
       enum: ['active', 'closed'],
       default: 'active',
     },
-    
     startedAt: {
       type: Date,
       default: Date.now,
