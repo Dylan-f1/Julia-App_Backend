@@ -273,6 +273,61 @@ exports.getConversationsForProfessional = async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
+exports.getConversationForPatient = async (req, res) => {
+  try {
+    const conversation = await Conversation.findOne({
+      _id: req.params.id,
+      patientId: req.patient._id // Vérifier que c'est bien SA conversation
+    }).populate('messages');
+    
+    if (!conversation) {
+      return res.status(404).json({ message: 'Conversation non trouvée' });
+    }
+    
+    res.json(conversation);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+exports.getConversationForPatient = async (req, res) => {
+  try {
+    console.log('📖 getConversationForPatient - conversationId:', req.params.id);
+    console.log('📖 patientId:', req.patient._id);
+
+    const conversation = await Conversation.findOne({
+      _id: req.params.id,
+      patientId: req.patient._id // Vérifier que c'est SA conversation
+    });
+    
+    if (!conversation) {
+      console.log('❌ Conversation non trouvée');
+      return res.status(404).json({ message: 'Conversation non trouvée' });
+    }
+    
+    console.log('✅ Conversation trouvée:', conversation._id);
+    res.json(conversation);
+  } catch (error) {
+    console.error('❌ Erreur getConversationForPatient:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+// Récupérer l'historique des conversations d'un patient
+exports.getConversationHistory = async (req, res) => {
+  try {
+    console.log('📚 getConversationHistory - patientId:', req.patient._id);
+
+    const conversations = await Conversation.find({
+      patientId: req.patient._id,
+      status: 'closed' // Seulement les conversations fermées
+    }).sort({ updatedAt: -1 }); // Plus récentes en premier
+    
+    console.log('✅ Historique trouvé:', conversations.length, 'conversations');
+    res.json(conversations);
+  } catch (error) {
+    console.error('❌ Erreur getConversationHistory:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
 
 // @desc    Get single conversation (professional)
 // @route   GET /api/conversations/:id
@@ -298,4 +353,15 @@ exports.getConversation = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
+};
+module.exports = {
+  startConversation: exports.startConversation,
+  sendMessage: exports.sendMessage,
+  getActiveConversation: exports.getActiveConversation,
+  getConversation: exports.getConversation,
+  getAllConversations: exports.getConversationsForProfessional,
+  closeConversation: exports.closeConversation,
+  getConversationForPatient: exports.getConversationForPatient,
+  getConversationHistory: exports.getConversationHistory,
+
 };

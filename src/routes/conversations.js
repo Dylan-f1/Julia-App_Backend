@@ -6,14 +6,17 @@ const { protectProfessional, protectPatient } = require('../middlewares/auth');
 const {
   startConversation,
   sendMessage,
-  closeConversation,
   getActiveConversation,
-  getConversationHistory,
-  getConversationsForProfessional,
   getConversation,
+  getAllConversations,
+  closeConversation,
+  getConversationForPatient,
+  getConversationHistory,
 } = require('../controllers/conversationController');
 
-// Patient routes
+// ========== PATIENT ROUTES ==========
+
+// Démarrer une nouvelle conversation
 router.post(
   '/',
   protectPatient,
@@ -21,6 +24,7 @@ router.post(
   startConversation
 );
 
+// Envoyer un message dans une conversation
 router.post(
   '/:id/messages',
   protectPatient,
@@ -28,21 +32,23 @@ router.post(
   sendMessage
 );
 
+// Fermer une conversation
 router.post(
   '/:id/close',
   protectPatient,
-  [
-    body('gravityLevel').isInt({ min: 1, max: 3 }),
-    validate,
-  ],
+  [body('gravityLevel').isInt({ min: 1, max: 3 }), validate],
   closeConversation
 );
 
 router.get('/active', protectPatient, getActiveConversation);
+
 router.get('/history', protectPatient, getConversationHistory);
 
-// Professional routes
-router.get('/professional', protectProfessional, getConversationsForProfessional);
+router.get('/patient/:id', protectPatient, getConversationForPatient);
+
+// ========== PROFESSIONAL ROUTES ==========
+router.get('/professional', protectProfessional, getAllConversations);
+
 router.get('/:id', protectProfessional, getConversation);
 
 module.exports = router;
