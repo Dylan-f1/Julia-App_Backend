@@ -273,22 +273,8 @@ exports.getConversationsForProfessional = async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
-exports.getConversationForPatient = async (req, res) => {
-  try {
-    const conversation = await Conversation.findOne({
-      _id: req.params.id,
-      patientId: req.patient._id // Vérifier que c'est bien SA conversation
-    }).populate('messages');
-    
-    if (!conversation) {
-      return res.status(404).json({ message: 'Conversation non trouvée' });
-    }
-    
-    res.json(conversation);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+// @desc    Get single conversation for patient
+// @route   GET /api/conversations/patient/:id
 exports.getConversationForPatient = async (req, res) => {
   try {
     console.log('📖 getConversationForPatient - conversationId:', req.params.id);
@@ -296,35 +282,21 @@ exports.getConversationForPatient = async (req, res) => {
 
     const conversation = await Conversation.findOne({
       _id: req.params.id,
-      patientId: req.patient._id // Vérifier que c'est SA conversation
+      patientId: req.patient._id,
     });
-    
+
     if (!conversation) {
       console.log('❌ Conversation non trouvée');
       return res.status(404).json({ message: 'Conversation non trouvée' });
     }
-    
+
     console.log('✅ Conversation trouvée:', conversation._id);
-    res.json(conversation);
+    res.json({
+      success: true,
+      conversation,
+    });
   } catch (error) {
     console.error('❌ Erreur getConversationForPatient:', error);
-    res.status(500).json({ message: error.message });
-  }
-};
-// Récupérer l'historique des conversations d'un patient
-exports.getConversationHistory = async (req, res) => {
-  try {
-    console.log('📚 getConversationHistory - patientId:', req.patient._id);
-
-    const conversations = await Conversation.find({
-      patientId: req.patient._id,
-      status: 'closed' // Seulement les conversations fermées
-    }).sort({ updatedAt: -1 }); // Plus récentes en premier
-    
-    console.log('✅ Historique trouvé:', conversations.length, 'conversations');
-    res.json(conversations);
-  } catch (error) {
-    console.error('❌ Erreur getConversationHistory:', error);
     res.status(500).json({ message: error.message });
   }
 };

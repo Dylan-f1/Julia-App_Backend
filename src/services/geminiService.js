@@ -31,23 +31,42 @@ Contexte patient:
 - Prochaine séance: ${patientContext.nextSessionDate ? new Date(patientContext.nextSessionDate).toLocaleDateString('fr-FR') : 'Non programmée'}
 `;
 
-    // Construire l'historique de conversation
-    const conversationHistory = messages.map(msg => {
+    // Séparer l'historique précédent du dernier message utilisateur
+    // Gemini attend : history = messages précédents, sendMessage = dernier message
+    const allMessages = messages.map(msg => {
       const role = msg.sender === 'patient' ? 'user' : 'model';
       return { role, parts: [{ text: msg.content }] };
     });
 
+    // L'historique = tous les messages SAUF le dernier (qui sera envoyé via sendMessage)
+    const history = allMessages.slice(0, -1);
+    const lastMessage = allMessages[allMessages.length - 1];
+
+    // S'assurer que l'historique alterne correctement user/model (requis par Gemini)
+    const cleanHistory = [];
+    for (let i = 0; i < history.length; i++) {
+      const msg = history[i];
+      if (cleanHistory.length > 0 && cleanHistory[cleanHistory.length - 1].role === msg.role) {
+        // Fusionner les messages consécutifs du même rôle
+        cleanHistory[cleanHistory.length - 1].parts[0].text += '\n' + msg.parts[0].text;
+      } else {
+        cleanHistory.push({ role: msg.role, parts: [{ text: msg.parts[0].text }] });
+      }
+    }
+
     const chat = model.startChat({
-      history: conversationHistory,
+      history: cleanHistory,
+      systemInstruction: {
+        parts: [{ text: `${SYSTEM_PROMPT}\n\n${contextPrompt}` }],
+      },
       generationConfig: {
         maxOutputTokens: 500,
         temperature: 0.7,
       },
     });
 
-    const result = await chat.sendMessage(
-      `${SYSTEM_PROMPT}\n\n${contextPrompt}\n\nRéponds de manière empathique et aidante.`
-    );
+    // Envoyer le dernier message de l'utilisateur pour obtenir la réponse IA
+    const result = await chat.sendMessage(lastMessage.parts[0].text);
 
     const response = await result.response;
     const text = response.text();
@@ -72,6 +91,15 @@ Contexte patient:
     };
   } catch (error) {
     console.error('Erreur Gemini:', error);
+
+    // Si quota dépassé (429), renvoyer un message fallback au lieu de crasher
+    if (error.status === 429) {
+      return {
+        response: 'Désolé, je suis temporairement indisponible en raison d\'une forte demande. Merci de réessayer dans quelques instants. Si vous traversez un moment difficile, n\'hésitez pas à contacter votre thérapeute ou les urgences.',
+        urgencyDetected: false,
+      };
+    }
+
     throw new Error('Erreur lors de la génération de la réponse');
   }
 };
