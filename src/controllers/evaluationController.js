@@ -5,7 +5,7 @@ const Patient = require('../models/Patient');
 // @route   POST /api/evaluations
 exports.createEvaluation = async (req, res) => {
   try {
-    const { mood, note } = req.body;
+    const { mood, anxiety, sleep, note } = req.body;
     const patientId = req.patient._id;
 
     // Créer ou mettre à jour l'évaluation du jour
@@ -19,15 +19,16 @@ exports.createEvaluation = async (req, res) => {
 
     if (evaluation) {
       evaluation.mood = mood;
-      evaluation.note = note;
+      if (anxiety !== undefined) evaluation.anxiety = anxiety;
+      if (sleep !== undefined) evaluation.sleep = sleep;
+      if (note !== undefined) evaluation.note = note;
       await evaluation.save();
     } else {
-      evaluation = await DailyEvaluation.create({
-        patientId,
-        mood,
-        note,
-        date: today,
-      });
+      const evalData = { patientId, mood, date: today };
+      if (anxiety !== undefined) evalData.anxiety = anxiety;
+      if (sleep !== undefined) evalData.sleep = sleep;
+      if (note !== undefined) evalData.note = note;
+      evaluation = await DailyEvaluation.create(evalData);
     }
 
     res.status(201).json({

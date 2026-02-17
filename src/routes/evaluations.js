@@ -16,6 +16,8 @@ router.post(
   protectPatient,
   [
     body('mood').isInt({ min: 1, max: 5 }),
+    body('anxiety').optional().isInt({ min: 1, max: 5 }),
+    body('sleep').optional().isInt({ min: 1, max: 5 }),
     validate,
   ],
   createEvaluation

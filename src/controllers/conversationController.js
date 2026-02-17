@@ -277,8 +277,8 @@ exports.getConversationsForProfessional = async (req, res) => {
 // @route   GET /api/conversations/patient/:id
 exports.getConversationForPatient = async (req, res) => {
   try {
-    console.log('📖 getConversationForPatient - conversationId:', req.params.id);
-    console.log('📖 patientId:', req.patient._id);
+    console.log('getConversationForPatient - conversationId:', req.params.id);
+    console.log('patientId:', req.patient._id);
 
     const conversation = await Conversation.findOne({
       _id: req.params.id,
@@ -286,17 +286,17 @@ exports.getConversationForPatient = async (req, res) => {
     });
 
     if (!conversation) {
-      console.log('❌ Conversation non trouvée');
+      console.log('Conversation non trouvée');
       return res.status(404).json({ message: 'Conversation non trouvée' });
     }
 
-    console.log('✅ Conversation trouvée:', conversation._id);
+    console.log('Conversation trouvée:', conversation._id);
     res.json({
       success: true,
       conversation,
     });
   } catch (error) {
-    console.error('❌ Erreur getConversationForPatient:', error);
+    console.error('Erreur getConversationForPatient:', error);
     res.status(500).json({ message: error.message });
   }
 };

@@ -38,10 +38,10 @@ exports.sendMagicLink = async (email, token, patientName) => {
       ],
     });
 
-    console.log('✅ Email envoyé:', result.body);
+    console.log('Email envoyé:', result.body);
     return { success: true };
   } catch (error) {
-    console.error('❌ Erreur envoi email:', error);
+    console.error('Erreur envoi email:', error);
     throw new Error('Erreur lors de l\'envoi de l\'email');
   }
 };

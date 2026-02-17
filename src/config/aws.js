@@ -10,7 +10,7 @@ if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     },
   });
-  console.log('✅ AWS S3 configuré');
+  console.log('AWS S3 configuré');
 } else {
   console.log('⚠️ AWS S3 non configuré (clés manquantes)');
 }

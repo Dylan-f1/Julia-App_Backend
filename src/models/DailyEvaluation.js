@@ -21,6 +21,16 @@ const dailyEvaluationSchema = new mongoose.Schema(
       min: 1,
       max: 5,
     },
+    anxiety: {
+      type: Number,
+      min: 1,
+      max: 5,
+    },
+    sleep: {
+      type: Number,
+      min: 1,
+      max: 5,
+    },
     note: {
       type: String,
       trim: true,

@@ -29,7 +29,7 @@ exports.createPatient = async (req, res) => {
 
     const professionalId = req.user._id;
     console.log('🆔 Professional ID:', professionalId);
-    console.log('✅ Création du patient en cours...');
+    console.log('Création du patient en cours...');
 
     // Créer le patient
     const patient = await Patient.create({
@@ -65,19 +65,19 @@ exports.createPatient = async (req, res) => {
       },
     });
 
-    console.log('✅ Patient créé:', patient._id);
+    console.log('Patient créé:', patient._id);
 
     // Générer le magic link
     const token = patient.generateMagicLink();
     await patient.save();
 
-    console.log('✅ Magic link généré');
+    console.log('Magic link généré');
 
     // Générer QR code
     const magicLink = `${process.env.FRONTEND_URL}/auth/verify?token=${token}`;
     const qrCodeDataUrl = await QRCode.toDataURL(magicLink);
 
-    console.log('✅ QR code généré');
+    console.log('QR code généré');
 
     // Envoyer l'email au patient
     await emailService.sendMagicLink(
@@ -86,7 +86,7 @@ exports.createPatient = async (req, res) => {
       `${firstName} ${lastName}`
     );
 
-    console.log('✅ Email envoyé');
+    console.log('Email envoyé');
 
     res.status(201).json({
       success: true,

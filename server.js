@@ -12,6 +12,6 @@ const server = app.listen(PORT, () => {
 });
 
 process.on('unhandledRejection', (err) => {
-  console.error('❌ Erreur non gérée:', err);
+  console.error('Erreur non gérée:', err);
   server.close(() => process.exit(1));
 });

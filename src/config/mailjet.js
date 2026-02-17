@@ -5,7 +5,7 @@ if (process.env.MAILJET_API_KEY && process.env.MAILJET_SECRET_KEY) {
     process.env.MAILJET_API_KEY,
     process.env.MAILJET_SECRET_KEY
   );
-  console.log('✅ Mailjet configuré');
+  console.log('Mailjet configuré');
 } else {
   console.log('⚠️ Mailjet non configuré (clés manquantes)');
 }
