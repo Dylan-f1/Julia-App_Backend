@@ -60,7 +60,7 @@ Contexte patient:
         parts: [{ text: `${SYSTEM_PROMPT}\n\n${contextPrompt}` }],
       },
       generationConfig: {
-        maxOutputTokens: 500,
+        maxOutputTokens: 1024,
         temperature: 0.7,
       },
     });
@@ -94,13 +94,23 @@ Contexte patient:
 
     // Si quota dépassé (429), renvoyer un message fallback au lieu de crasher
     if (error.status === 429) {
+      const fallbackResponses = [
+        'Je suis là pour vous écouter. Je rencontre un petit souci technique en ce moment, mais je vous invite à partager ce que vous ressentez. Votre thérapeute pourra y avoir accès lors de votre prochaine séance.',
+        'Merci de me faire confiance. Je suis momentanément limitée techniquement, mais vos messages sont bien reçus et conservés. Votre thérapeute reste disponible si vous avez besoin d\'un soutien immédiat.',
+        'Je vous lis et je vous entends. Je traverse une petite limitation technique, mais prenez le temps d\'exprimer ce que vous ressentez ici — tout est enregistré pour votre suivi.',
+      ];
+      const randomFallback = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
       return {
-        response: 'Désolé, je suis temporairement indisponible en raison d\'une forte demande. Merci de réessayer dans quelques instants. Si vous traversez un moment difficile, n\'hésitez pas à contacter votre thérapeute ou les urgences.',
+        response: randomFallback,
         urgencyDetected: false,
       };
     }
 
-    throw new Error('Erreur lors de la génération de la réponse');
+    // Fallback générique pour toute autre erreur
+    return {
+      response: 'Je suis momentanément indisponible. Si vous traversez un moment difficile, n\'hésitez pas à contacter directement votre thérapeute.',
+      urgencyDetected: false,
+    };
   }
 };
 
